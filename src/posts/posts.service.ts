@@ -210,19 +210,19 @@ export class PostsService {
     return { id };
   }
 
-  private assertImages(files: Multer.File[]) {
+  private assertImages(files: Express.Multer.File[]) {
     for (const f of files) {
       const ok = ['image/png', 'image/jpeg'].includes(f.mimetype);
       if (!ok) throw new BadRequestException('Images must be PNG/JPG');
     }
   }
 
-  private assertVideo(file: Multer.File) {
+  private assertVideo(file: Express.Multer.File) {
     const ok = ['video/mp4'].includes(file.mimetype);
     if (!ok) throw new BadRequestException('Video must be MP4');
   }
 
-  async uploadImages(files: Multer.File[]) {
+  async uploadImages(files: Express.Multer.File[]) {
     if (!files?.length) throw new BadRequestException('files required');
     this.assertImages(files);
 
@@ -253,7 +253,7 @@ export class PostsService {
     };
   }
 
-  async uploadVideo(file: Multer.File) {
+  async uploadVideo(file: Express.Multer.File) {
     if (!file) throw new BadRequestException('file required');
     this.assertVideo(file);
 

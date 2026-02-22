@@ -1,4 +1,17 @@
-import { Body, Controller, Get, Put, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Put,
+  Query,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+
 import { SettingsService } from './settings.service';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
 
@@ -32,5 +45,27 @@ export class SettingsController {
     this.rt.emitSettingsUpdate(saved);
 
     return saved;
+  }
+
+  /**
+   * POST /settings/upload-background
+   * multipart/form-data
+   * field name: file
+   */
+  @Post('/settings/upload-background')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10 MB
+      },
+    }),
+  )
+  async uploadBackground(@UploadedFile() file?: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('file is required');
+    }
+
+    return this.settings.uploadLandingBackground(file);
   }
 }
